@@ -1,0 +1,77 @@
+<!doctype html>
+<!--
+LATAM Partner Training Team \m/
+-->
+
+<html lang="en">
+    <head>
+        <title>AWS Container Services</title>
+        <style>
+            @font-face {
+                font-family: AmazonEmber;
+                src: url(font/AmazonEmber_Lt.ttf);
+            }
+            div {
+                font-family: AmazonEmber;
+            }
+            h1 {
+                color: #505050;
+                font-family: AmazonEmber;
+                font-size: 200%;
+            }
+            h2 {
+                color: gray;
+                font-family: AmazonEmber;
+                font-size: 130%;
+            }
+            p  {
+                color: gray;
+                font-family: AmazonEmber;
+                font-size: 120%;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript">
+
+        var metadata =  function () {
+        var response = $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: '/metadata.json',
+            dataType: "json",
+            success: function (json) {
+                response = json
+                clusterArn = json.Cluster
+                cluster = clusterArn.split(/[/]+/).pop();
+                document.getElementById("cluster").innerHTML = 'ECS Cluster: '+cluster;
+                taskArn = json.TaskARN
+                task = taskArn.split(/[/]+/).pop();
+                document.getElementById("task").innerHTML = 'Task ID: '+task;
+                taskDef = json.Family
+                document.getElementById("taskDef").innerHTML = 'Task Definition: '+taskDef;
+                console.log(response)
+                console.log(cluster)
+                console.log(task)
+                console.log(taskDef)
+            }
+        });
+        return response;
+    }();
+
+    </script>
+    </head>
+
+  
+
+    <body>
+
+    <!-- Content -->
+    <h1>CI/CD with AWS ECS | Demo</h1>
+    <hr style="width:60%;text-align:left;margin-left:0">
+    <h2 id="cluster"></h2>
+    <h2 id="task"></h2>
+    <h2 id="taskDef"></h2>
+    <p style="margin-top:5ex">Powered by <a rel="nofollow" href="https://aws.amazon.com/partners/">AWS Partner Training Team</p>
+    <img src="images/undraw/aws-training.png" width="250">
+    </body>
+</html>

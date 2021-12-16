@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+ <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>AWS STP Training</title>
+
+    <!-- MAIN STYLE -->
+    <style>
+
+        .sansserif {
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+    </style>
+<!--
+
+LATAM Parter Training Team \m/
+
+-->
+</head>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+    var metadata =  function () {
+       var response = $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: '/metadata.json',
+            dataType: "json",
+            success: function (json) {
+                response = json
+                clusterArn = json.Cluster
+                cluster = clusterArn.split(/[/]+/).pop();
+                document.getElementById("cluster").innerHTML = 'ECS Cluster: '+cluster;
+                taskArn = json.TaskARN
+                task = taskArn.split(/[/]+/).pop();
+                document.getElementById("task").innerHTML = 'Task ID: '+task;
+                taskDef = json.Family
+                document.getElementById("taskDef").innerHTML = 'Task Definition: '+taskDef;
+                console.log(response)
+                console.log(cluster)
+                console.log(task)
+                console.log(taskDef)
+            }
+        });
+        return response;
+    }();
+
+    </script>
+</head>
+
+  
+
+  <body>
+
+    <!-- ABOUT -->
+    <section class="about full-screen d-lg-flex justify-content-center align-items-center" id="about">
+        <div class="container">
+            <div class="row">    
+                <div class="col-lg-10 col-md-6 col-6 d-flex align-items-right">
+                    <div class="about-text">
+                        <h1 class="sansserif">ECS Container metadata</h1>
+                        <p> </p>
+                        <body>
+                            <h2 class="sansserif">
+                                <p id="cluster"></p>
+                            </h2>
+                        </body>
+                        <body>
+                            <h2 class="sansserif">
+                                <p id="task"></p>
+                            </h2>  
+                        </body>
+                        <body>
+                            <h2 class="sansserif">
+                                <p id="taskDef"></p>
+                            </h2>   
+                        </body>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+     <footer class="footer py-5">
+          <div class="container">
+               <div class="row">
+
+                    <div class="col-lg-12 col-12">                                
+                        <p class="sansserif"></p>
+                        <p class="sansserif">Powered by <a rel="nofollow" href="https://aws.amazon.com/es/partners/training/latam">LATAM Partner Training Team</a></p>
+
+                    </div>
+               </div>
+          </div>
+     </footer>
+  </body>
+</html>

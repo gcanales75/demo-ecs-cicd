@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Build ID input to index file...
+      - sed -i "52 i \                document.getElementById("buildId").innerHTML = 'CodeBuild build ID: $CODEBUILD_BUILD_ID';" index.1.html
+      - sed -i '75 i \    <h2 id="buildId"></h2>' index.1.html
+      - echo Building the Docker image...          
+      - docker build -t demo/ecs .
+      - docker tag stp/website:latest $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/stp/website:$CODEBUILD_BUILD_ID
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo/ecs:$CODEBUILD_BUILD_ID
+artifacts:
+  files:
+    - '**/*'
