@@ -14,7 +14,7 @@ phases:
       - sed -i '75 i \    <h2 id="buildId"></h2>' index.1.html
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
-      - docker tag stp/website:latest $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/stp/website:$CODEBUILD_BUILD_ID
+      - docker tag demo/ecs:latest $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo-ecs:$CODEBUILD_BUILD_ID
   post_build:
     commands:
       - echo Build completed on `date`
