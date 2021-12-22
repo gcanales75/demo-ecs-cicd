@@ -1,9 +1,9 @@
 FROM httpd:2.4
 
 RUN apt-get update -y && apt-get install -y wget
-COPY index.html /usr/local/apache2/htdocs/
-COPY font /usr/local/apache2/htdocs/font
-COPY images /usr/local/apache2/htdocs/images
+COPY website/index.html /usr/local/apache2/htdocs/
+COPY website/font /usr/local/apache2/htdocs/font
+COPY website/images /usr/local/apache2/htdocs/images
 
 EXPOSE 80
 
