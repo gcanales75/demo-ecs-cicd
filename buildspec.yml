@@ -6,6 +6,8 @@ phases:
       - echo Logging in to Amazon ECR...
       - echo $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID
       - echo $AWS_ACCOUNT_ID
+      - echo $AWS_DEFAULT_REGION
+      - echo $CODEBUILD_BUILD_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
