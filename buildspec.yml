@@ -9,9 +9,7 @@ phases:
       - export ACCOUNT_NUMBER=`aws sts get-caller-identity --query 'Account' --output text`
       - echo $ACCOUNT_NUMBER
       - echo $AWS_DEFAULT_REGION
-      - echo $CODEBUILD_BUILD_ID
-      - BUILD_ID="$(cut -d':' -f2 <<<$CODEBUILD_BUILD_ID)"
-      - echo $BUILD_ID
+      - echo CODEBUILD_BUILD_NUMBER
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
@@ -22,12 +20,12 @@ phases:
 #      - sed -i '75 i \    <h2 id="buildId"></h2>' index.1.html
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
-      - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo-ecs:$BUILD_ID
+      - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo-ecs:$CODEBUILD_BUILD_NUMBER
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo/ecs:$BUILD_ID
+      - docker push $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo/ecs:$CODEBUILD_BUILD_NUMBER
 artifacts:
   files:
     - '**/*'
