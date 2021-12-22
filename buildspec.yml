@@ -5,6 +5,8 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws sts get-caller-identity
+      - export ACCOUNT_NUMBER=`aws sts get-caller-identity --query 'Account' --output text`
+      - echo $ACCOUNT_NUMBER
       - echo $AWS_DEFAULT_REGION
       - echo $CODEBUILD_BUILD_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
