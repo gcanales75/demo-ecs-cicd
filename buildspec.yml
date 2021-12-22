@@ -9,6 +9,10 @@ phases:
       - echo $ACCOUNT_NUMBER
       - echo $AWS_DEFAULT_REGION
       - echo $CODEBUILD_BUILD_ID
+      - IFS=':' read -r -a array <<< "$CODEBUILD_BUILD_ID"
+      - echo "${array[1]}"
+      - export BUILD_ID=${array[1]}
+      - echo $BUILD_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
@@ -19,12 +23,12 @@ phases:
 #      - sed -i '75 i \    <h2 id="buildId"></h2>' index.1.html
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
-      - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo-ecs:$CODEBUILD_BUILD_ID
+      - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo-ecs:$BUILD_ID
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo/ecs:$CODEBUILD_BUILD_ID
+      - docker push $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/demo/ecs:$BUILD_ID
 artifacts:
   files:
     - '**/*'
