@@ -9,9 +9,7 @@ phases:
       - echo $ACCOUNT_NUMBER
       - echo $AWS_DEFAULT_REGION
       - echo $CODEBUILD_BUILD_ID
-      - IFS=':' read -r -a array <<< "$CODEBUILD_BUILD_ID"
-      - echo "${array[1]}"
-      - export BUILD_ID=${array[1]}
+      - export BUILD_ID="$(cut -d':' -f2 <<<$CODEBUILD_BUILD_ID)"
       - echo $BUILD_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
