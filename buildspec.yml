@@ -26,6 +26,8 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CODEBUILD_BUILD_ID
+      - echo Writing image definitions file...
+      - printf '[{"name":"demoEcs","imageUri":$ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CODEBUILD_BUILD_ID}]' > imagedefinitions.json
 artifacts:
-  files:
-    - '**/*'
+  files: imagedefinitions.json
+#    - '**/*'
