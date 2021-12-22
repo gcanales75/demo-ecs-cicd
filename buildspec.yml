@@ -16,7 +16,6 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Build ID input to index file...
-      - sed -i '52 i \                document.getElementById('buildId').innerHTML = "CodeBuild build ID: $CODEBUILD_BUILD_ID";' index.1.html
       - sed -i -e 's/BUILD_ID/${CODEBUILD_BUILD_ID}/g' /website/index.html
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
