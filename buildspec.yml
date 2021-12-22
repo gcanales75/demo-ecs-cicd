@@ -16,7 +16,8 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Build ID input to index file...
-      - sed -i -e 's/BUILD_ID/${CODEBUILD_BUILD_ID}/g' /website/index.html
+      - chmod +x updateIndex.sh 
+      - ./updateIndex.sh
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
       - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CODEBUILD_BUILD_ID
