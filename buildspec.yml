@@ -4,9 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - printenv
-      - echo $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID
-      - echo $AWS_ACCOUNT_ID
+      - aws sts get-caller-identity
       - echo $AWS_DEFAULT_REGION
       - echo $CODEBUILD_BUILD_ID
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
