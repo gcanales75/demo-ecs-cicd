@@ -17,7 +17,7 @@ phases:
       - echo Build started on `date`
       - echo Build ID input to index file...
       - chmod +x updateIndex.sh 
-      - $BUILD=$CODEBUILD_BUILD_ID sh updateIndex.sh
+      - env BUILD=$CODEBUILD_BUILD_ID sh updateIndex.sh
       - echo Building the Docker image...          
       - docker build -t demo/ecs .
       - docker tag demo/ecs:latest $ACCOUNT_NUMBER.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$CODEBUILD_BUILD_ID
