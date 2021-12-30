@@ -229,5 +229,3 @@ To make changes in the application code we will use a Cloud9 IDE
 1. Finally reload the load balancer browser page. You must see it updated with the most recent build ID and *Mantainer* information. This may take 3 to 5 minutes.
 
 1. Optionally, you could make new changes to the sample web page code, the CI/CD pipeline will update the site with every `git push`.
-
-Ref: https://medium.com/analytics-vidhya/creating-ci-cd-pipeline-for-aws-ecs-part-ii-b43e4089cb52
