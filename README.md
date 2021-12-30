@@ -1,244 +1,233 @@
-# Lab-CodeServices-ECS-Fargate
+# CI/CD DEMO WITH AWS ECS
 
-CloudFormation
+In this lab you will use the AWS Development Tools to create a CI/CD pipeline to mantain an containerized application updated in a continuous and managed way.
 
-Crea un repositorio en CodeCommit para la página web
-Parametro URI de un channel de Slack
-Crea funcion Lambda que envia mensajes a Slack
+This diagram represent the lab's final architecture:
 
-SSH to the instance
-cd environment/
-cd website/
+You will deploy and configure the following AWS managed services:
 
-docker build -t stp/website .
-docker run --rm --name web -d --network host stp/website
+- CodeCommit
+- CodeBuild
+- CodeDeploy
+- Cloud9
+- Elastic Container Service (ECS)
+- Elastic Container Registry (ECR)
 
+## Task 1: Deploy CloudFormation template
 
-AWS CodeCommit setup
+In this fist task will create the environment resources required to create the CI/CD pipeline deploying a CloudFormation template.
 
-$ ssh-keygen
-Enter file in which to save the key (/home/ec2-user/.ssh/id_rsa): <hit enter>
-Enter passphrase (empty for no passphrase): <hit enter>
-Enter same passphrase again: <hit enter>
-Copy content of:
-$ cat /home/ec2-user/.ssh/id_rsa.pub
-In the IAM console, in the navigation pane, choose Users, and from the list of users, choose your IAM user. 
-On the user details page, choose the Security Credentials tab, and then choose Upload SSH public key. 
-Paste the contents of your SSH public key into the field, and then choose Upload SSH public key. 
-Copy or save the information in SSH Key ID
-On your local machine, use a text editor to create a config file in the ~/.ssh directory, and then add the following lines to the file, where the value for User is the SSH key ID you copied earlier: 
+The following resources will be created as part of the CloudFormation stack deployment.
 
-$ sudo nano ~/.ssh/config
+- VPC
+- ECS Fargate cluster
+- ECS task definition
+- Elastic Container Registry (ECR) repository
+- CodeCommit repository
+- Cloud9 environment
+- Application Load Balancer
+- CloudWatch log group
+- IAM roles and policies
 
-Paste the below content:
+1. Go to **Services** > **CloudFormation**
 
-Host git-codecommit.*.amazonaws.com
-  User APKAXTAS4XY5W534YD4E
-  IdentityFile ~/.ssh/id_rsa.pub
+1. Click on **Create stack**
 
-Save and name this file config
+1. the the **Specify template** section, click on the **Upload a template file** radio button.
 
-From the terminal, run the following command to change the permissions for the config file: 
+1. Click on **Choose file**
 
-Change permissions
-$ sudo chmod 600 config
+1. Navigateo to the CloudFormation template file you just downloaded. Select the file and click on **Open**.
 
-Test your connection
-$ ssh APKAXTAS4XY5W534YD4E@git-codecommit.us-east-1.amazonaws.com
+1. Click **Next**
 
-You shouls see
-You have successfully authenticated over SSH. You can use Git to interact with AWS CodeCommit.
+1. In the **Stack name** section, type a name for the stack (i.e. "CICD-demo").
 
-Your initial push to CodeCommit repo
-git init
-git add .
-git commit -m "v2 commit"
-git remote add codecommit1 ssh://APKAXTAS4XY5W534YD4E@git-codecommit.us-east-1.amazonaws.com/v1/repos/stpWebsite
-git push -u codecommit1 master
+1. Click **Next**
 
--------
-AWS CodeBuild
+1. In the **Configure stack options** page, click on **Next**
 
-Create Proyect
+1. In the **Review <stack-name>** page scroll to the end of the page, in the section under **Capabilities** check the box next to **I acknowledge that AWS CloudFormation might create IAM resources with custom names.**
 
-Name: stpWebsite
-Source provider: AWS CodeCommit
-Repository: stpWebsite
-Reference type: Branch
-Branch: master
+1. Click on **Create stack**.
 
-Envirenment
-Environment image: Managed image
-Operating system: Ubuntu
-Runtime(s): Standard
-Image: aws/codebuild/standard:2.0
-[x] Enable this flag if you want to build Docker images or want your builds to get elevated privileges
-Service role: New service role
+Stack deploymente will take ~5-8 minutes, please wait until completion. Once completed click on the **Outputs** tab and copy the URL value from the `albDNS` key and paste it in a notepad.
 
-EDIT POLICY: CodeBuildBasePolicy-stpWebsite-us-east-1 
+## Task 2: Create **ECS** Service
 
-{
-  "Statement": [
-    ### BEGIN ADDING STATEMENT HERE ###
-    {
-      "Action": [
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:CompleteLayerUpload",
-        "ecr:GetAuthorizationToken",
-        "ecr:InitiateLayerUpload",
-        "ecr:PutImage",
-        "ecr:UploadLayerPart"
-      ],
-      "Resource": "*",
-      "Effect": "Allow"
-    },
-    ### END ADDING STATEMENT HERE ###
-    ...
-  ],
-  "Version": "2012-10-17"
-}
+In this task you will create the ECS Service which will host the application.
 
-Detailed instructions: https://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
+1. First, confirm a Docker image has been pushed to the ECR repo `ecs-demo`. This image was created and pushed to ECR at CloudFormation stack deployment and will be used to create the first version of the web app.
 
+1. Navigate to **Service** > **Elastic Container Registry**. Repo is called `ecs-demo`, click on the repo name link and you must notice an image tagged as `v1`.
 
-Buildspec
-Build specifications: Use a buildspec file
+1. Ffrom the ECS console left panel click on **Clusters**.
 
-Logs
-[x] CloudWatch logs - optional
+1. Click on the cluster **ECS-DEMO** name link.
 
-Create build project <hit enter>
+1. In the Cluster page, **Services** tab, click on **Deploy**.
 
+1. In the **Deployment configuration** section, under **Family**, select **ecs-demo-td**, under **Revision** select the **(LATEST)**
 
-------
-ECS
+1. For **Service name** type `ecs-demo-service`.
 
-EC2 Prerequisites
-Security Groups
-    ALB seecurity group
-        alb-stpwebsite-sb (sg-04377210a9dc35652)
-            Inbound rules
-                80,8080 (from 0.0.0.0/0)
-    Containers security group
-        containers-stpwebsite-sg
-            Inbound rules
-                sg-04377210a9dc35652 (all trafic)
+1. For **Desired tasks**, type `2`.
 
-IAM Prerequisites
-    Service role for CodeDeploy: ecsCodeDeployRole (intentar borrar)
-        (The IAM role the service uses to make API requests to authorized AWS services. Create a service role for CodeDeploy in the IAM console. )
+1. Expand the **Load balancing** section.
 
-Aplication Load Balancer
-    Fargate load balancer
-        Name: stpwebsite-alb
-        Listeners: HTTP (8080)
+1. In the **Load balancer type** select **Application Load Balancer**.
 
-ECS Configuration
-Clusters
-    stpwebsite cluster
-        Cluster template: Networking only
-        Cluster name: stpwebsite-cluster
-    Create<hit enter>
+1. Under **Application Load Balancer** select **Use an existing load balancer**
 
-Task Definitions
-    stpwebsite task definition
-        Select launch type compatibility: Fargate
-        Task Definition Name: stpwebsite-td
-        Task Role: none
-        Task execution IAM role: Create new role
-        Task size: 0.5 GB
-        Task CPU (vCPU): 0.25 vCPU
-        Container Definitions: Add container
-            Container name: stpwebsite-container
-            Image: <ECR container image:version>
-            Port mappings: 80
-            Add<hit enter>
+1. In **Load balancer** select **DEMO-CICD** (this ALB has been created as part of the **CloudFormation** deplyment).
 
-Clusters
-    stpwebsite-cluster
-        Services <Create>
-            Launch type: Fargate
-            Task Definition: stpwebsite-td
-            Service name: stpwebsite-service
-            Number of tasks: 6
-            Deployments
-                Deployment type: Blue/green deployment (powered by AWS CodeDeploy)
-                Service role for CodeDeploy: ecsCodeDeployRole
-            Next step<hit enter>
-            Configure network
-                Cluster VPC: <project VPC>
-                Subnets: <private subnets (2)>
-                Security groups: containers-stpwebsite-sg
-                Auto-assign public IP: DISABLE
-            Load balancing
-                Load balancer type: Application Load Balancer
-                    Load balancer name: stpwebsite-alb
-                Container to load balance
-                    Container name : port: Add to load balancer
-                        Production listener port: 8080:HTTP
-                        Test listerer [ ] (uncheck)
-            Additional configuration
-                Target group 1 name: stpwebsite-tg-1
-                Target group 2 name: stpwebsite-tg-2
-            Service discovery (optional)
-                Enable service discovery integration: [ ] (uncheck)
-             Next step<hit enter>
-             Set Auto Scaling (optional)
-                Service Auto Scaling: Do not adjust the service’s desired count
-            Next step<hit enter>
-            Create Service<hit enter>
+1. In **Target group name** type `ecs-demo-tg`.
 
-Update Deployment group with appspec.json
+1. Under **Protocol** select **HTTP**.
 
---------
-CodePipeline
+1. Expand the **Networking** section.
 
-Pipeline settings
-    Pipeline name: stpwebsite-pipeline
-    Service role: New service role
-    <hit Next>
-    Add source stage
-        Source
-            Source provider: AWS CodeCommit
-            Repository name: stpWebsite
-            Branch name: master
-            Change detection options: mazon CloudWatch Events (recommended)
-    <hit Next>
-    Add build stage
-        Build - optional
-            Build provider: AWS CodeBuild
-            Region: US East (N. Virginia)
-            Project name: 
+1. Under **VPC** select **VPC-CICD-DEMO**.
 
+1. Under **Subnets** select *private-subnet-1* and *private-subnet-2*.
 
+1. Under **Security group** select **Use an existing security group**
 
+1. Under **Security group name** mark the check box next to **Containers-SG** security group and de-select the *default* security group.
 
+1. Disable the **Public IP** option.
 
+1. Click on **Deploy**.
 
-https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-ecs-ecr-codedeploy.html
+1. In the *Cluster* page click on the **Tasks** tab. You will see 2 tasks running.
 
+1. Open a new browser tab and paste in the address tab the Load Balancer URL you copied in a previous step. You must see the sample web page displayed (note there's no Build ID number).
 
-Get registry IDs
-aws ecr describe-repositories --query 'repositories[*].[registryId,repositoryUri]' --region us-east-1
+## Task 3: Enable Developer Tools Services
 
-Registry authentication
-$(aws ecr get-login --registry-ids 521878158907 --no-include-email --region us-east-1)
+In this task you will configure the AWS Developer managed services to create a CI/CD pipeline. This pipeline will update the application everytime a change in the local repository is pushed to the remote repository branch (main).
 
-Tag Image
-docker tag stp/website:latest ${ACCOUNT_NUMBER}.dkr.ecr.${AWS_REGION}.amazonaws.com/stp/website:latest
-docker tag stp/website:latest 521878158907.dkr.ecr.us-east-1.amazonaws.com/stp/website:latest
+1. Navigate to **Services** > **CodeCommit**.
 
-Push image to ECR
-docker push 521878158907.dkr.ecr.us-east-1.amazonaws.com/stp/website:latest
+1. Confirm **ecs-demo** repository exists. You will use this CodeCommite *git* repo to host the application source code.
 
-Crear ECS Task Definition
-Crear ECS Service
+1. Review README.md file
 
-Create CodeDepoy application
+1. From the left panel, under **Build** section, click on **Build projects**.
 
-Compute platform -> Amazon ECS
-Create deployment group
+1. Click on **Create build project**.
 
-[Crear service rol]
+1. In the **Project configuration** section, under **Project name** type `ecs-demo`.
 
+1. in the **Source** section under repository, select **ecs-demo**.
 
+1. Under **Branch** select **main**.
+
+1. In the **Environment** section, for **Operating system** select **Ubuntu**.
+
+1. Under **Runtime(s)** select **Standard**.
+
+1. Under **Image** select the most recent version.
+
+1. Mark the checkbox under **Privileged** to enable it.
+
+1. Under **Service role** select **Existing service role**.
+
+1. Under **Role ARN** select the role named **CodeBuildBasePolicy-ecs-demo**.
+
+1. Click **Create build project**.
+
+1. From the left panel, under **Pipeline**, click on **Pipelines**.
+
+1. Click on **Create pipeline**.
+
+1. In the **Pipeline settings** section, under **Pipeline name**, type `ecs-demo-pipeline`.
+
+1. A new service role name will automatically be populated, leave as default and click on **Next**.
+
+1. As **Source provider** select **AWS CodeCommit**.
+
+1. For **Repository name** select **ecs-demo**.
+
+1. For **Branch name** select **main**.
+
+1. Click on **Next**.
+
+1. For **Build provider** select **AWS CodeBuild**.
+
+1. For **Project name** select **ecs-demo-build**.
+
+1. Click on **Next**.
+
+1. For **Deploy provider** select **Amazon ECS**.
+
+1. For **Cluster name** select **ECS-DEMO**.
+
+1. For **Service name** select **ecs-service-demo**.
+
+1. For **Image definitions file** type `imagedefinitions.json`.
+
+    Note about `imagedefinitions.json`: This file contains the image tag in a json file structure so CodeBuild can identify the ECR Docker image to be deployed as part of the pipeline run. The Docker image is being created and pushed to ECR at the build time as well, and the `imagedefinitions.json` file is created and uploaded to an S3 bucket as build artifact.
+
+1. Click on **Next**.
+
+1. Click on **Create pipeline**.
+
+    This will start the pipeline including the *Build* and *Deploy* stages.
+
+1. The pipeline completion will take ~5 minutes, after complete go to the load balancer URL browser tab and you will see there is a build ID number, if you navigate to the **CodeBuild** console you will notice it will match the CodeBuild latest job ID.
+
+## Task 4: Working in the Cloud9 IDE
+
+To make changes in the application code we will use a Cloud9 IDE
+
+1. Go to **Services** > **Cloud9**.
+
+1. Open the **CICD-DEMO** IDE.
+
+1. Close the below panel and the "Welcome" and "AWS Toolkit" tabs.
+
+1. Open a new *terminal*.
+
+1. Run the below commands to connect your Cloud9 environment to the remote repository.
+
+    ```git
+    git config --global credential.helper '!aws codecommit credential-helper $@'
+    git config --global credential.UseHttpPath true
+    ```
+
+    Reference: https://docs.aws.amazon.com/cloud9/latest/user-guide/sample-codecommit.html
+
+1. Run `git clone` to copy locally the remote CodeCommit repo.
+
+    ```git
+    git clone https://git-codecommit.us-east-2.amazonaws.com/v1/repos/ecs-demo
+    ```
+
+1. From the left panel, double-click file `index.html` inside `website/` folder.
+
+1. Edit line 73 and substitute the mantainer name. You could use an alias or your initials. Save the file.
+
+1. Navigate to the project content, type:
+
+    `cd ecs-demo`
+
+1. Git push to the remote Codecommit repository with the latest update. Type:
+
+    ```git
+    git add .
+    git commit -m "edit maintainer name line 73"
+    git push -u origin main
+    ```
+
+1. Wait a few seconds and navigate to CodePipeline console and confirm the pipeline is in `In progress` status.
+
+1. Navigate to the CodeCommit repo and confirm the content of the `index.html` file has been updated with your latest changes.
+
+1. Wait to the build step to complete and confirm a new image has been created and pushed to ECR. It's tag must reference the CodeBuild ID job.
+
+1. Finally reload the load balancer browser page. You must see it updated with the most recent build ID and *Mantainer* information. This may take 3 to 5 minutes.
+
+1. Optionally, you could make new changes to the sample web page code, the CI/CD pipeline will update the site with every `git push`.
+
+Ref: https://medium.com/analytics-vidhya/creating-ci-cd-pipeline-for-aws-ecs-part-ii-b43e4089cb52

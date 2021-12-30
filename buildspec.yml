@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - printenv
+#      - printenv
       - aws sts get-caller-identity
       - export ACCOUNT_NUMBER=`aws sts get-caller-identity --query 'Account' --output text`
       - echo $ACCOUNT_NUMBER
