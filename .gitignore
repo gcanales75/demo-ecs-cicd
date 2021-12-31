@@ -1,5 +1,6 @@
 CloudFormation/CF-containers-Lab1.json
 CloudFormation/CF-ECS-DEMO-v1.json
+CloudFormation/CF-ECS-DEMO-v2.json
 zip-instructions
 CodeBuildBasePolicy-stpWebsite-us-east-1.json
 cicdEcsDemo.zip
