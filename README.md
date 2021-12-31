@@ -1,8 +1,11 @@
 # CI/CD DEMO WITH AWS ECS
 
+
 In this lab you will use the AWS Development Tools to create a CI/CD pipeline to mantain an containerized application updated in a continuous and managed way.
 
 This diagram represent the lab's final architecture:
+
+![diagram1](images/ECS-CICD-demo.drawio.png)
 
 You will deploy and configure the following AWS managed services:
 
@@ -29,6 +32,10 @@ The following resources will be created as part of the CloudFormation stack depl
 - CloudWatch log group
 - IAM roles and policies
 
+1. Download CloudFormation template file `CF-ecs-cicd-demo.template`
+
+1. Before start this lab, make sure your console default region is **Ohio (us-east-2)**
+
 1. Go to **Services** > **CloudFormation**
 
 1. Click on **Create stack**
@@ -51,7 +58,7 @@ The following resources will be created as part of the CloudFormation stack depl
 
 1. Click on **Create stack**.
 
-Stack deploymente will take ~5-8 minutes, please wait until completion. Once completed click on the **Outputs** tab and copy the URL value from the `albDNS` key and paste it in a notepad.
+Stack deploymente will take ~5-8 minutes, please wait until completion. Once completed click on the **Outputs** tab and copy the URL value from the `LoadBalancerDns` key and paste it in a notepad.
 
 ## Task 2: Create **ECS** Service
 

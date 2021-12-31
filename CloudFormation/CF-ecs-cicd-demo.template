@@ -229,7 +229,7 @@ Resources:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       IpAddressType: ipv4
-      Name: DEMO-CICD
+      Name: demo-cicd
       Scheme: internet-facing
       SecurityGroups:
         - !Ref LbSg
@@ -362,7 +362,7 @@ Resources:
     Properties:
       LogGroupName: /ecs/ecs-demo-td
 Outputs:
-  albDns:
+  LoadBalancerDns:
     Description: ALB DNS NAME
     Value: !GetAtt 
       - ALB
