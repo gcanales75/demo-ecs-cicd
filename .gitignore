@@ -5,3 +5,4 @@ zip-instructions
 CodeBuildBasePolicy-stpWebsite-us-east-1.json
 cicdEcsDemo.zip
 userdata.sh
+git
