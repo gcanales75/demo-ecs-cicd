@@ -57,7 +57,7 @@ The following resources will be created as part of the CloudFormation stack depl
 
 1. Click on **Create stack**.
 
-Stack deploymente will take ~7 minutes, please wait until completion. Once completed click on the stack's **Outputs** tab and copy the URL value from the `LoadBalancerDns` key and paste it in a notepad.
+    Stack deploymente will take ~7 minutes, please wait until completion. Once completed click on the stack's **Outputs** tab and copy the URL value from the `LoadBalancerDns` key and paste it in a notepad.
 
 ## Task 2: Create **ECS** Service
 
@@ -71,7 +71,7 @@ In this task you will create the **ECS Service** which will host the application
 
 1. First confirm a Docker image has been pushed to the ECR repo `ecs-demo`. This image was created and pushed to ECR at CloudFormation stack deployment and will be used to create the first version of the web app. From the ECS console left panel, under **Amazon ECR**, click on **Repositories**. Repo is called `ecs-demo`, click on the repo name link and you must notice an image tagged as `v1`.
 
-The CloudFormation stack has already created a task definition based on that Docker image.
+            The CloudFormation stack has already created a task definition based on that Docker image.
 
 1. From the ECS console left panel click on **Clusters**.
 
@@ -193,7 +193,7 @@ In this task you will configure the AWS Developer managed services to create a C
 
 1. The pipeline completion will take ~5 minutes, after completed go to the load balancer URL browser tab, reload it, and you will see there is a build ID number, if you navigate to the **CodeBuild** console you will notice it will match the CodeBuild latest job ID. 
 
-There is still no *Maintainer* info, we will fix it in the next task.
+    There is still no *Maintainer* info, we will fix it in the next task.
 
 ## Task 4: Working in the Cloud9 IDE
 
