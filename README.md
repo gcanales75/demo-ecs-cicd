@@ -71,7 +71,7 @@ In this task you will create the **ECS Service** which will host the application
 
 1. First confirm a Docker image has been pushed to the ECR repo `ecs-demo`. This image was created and pushed to ECR at CloudFormation stack deployment and will be used to create the first version of the web app. From the ECS console left panel, under **Amazon ECR**, click on **Repositories**. Repo is called `ecs-demo`, click on the repo name link and you must notice an image tagged as `v1`.
 
-            The CloudFormation stack has already created a task definition based on that Docker image.
+    The CloudFormation stack has already created a task definition based on that Docker image.
 
 1. From the ECS console left panel click on **Clusters**.
 
