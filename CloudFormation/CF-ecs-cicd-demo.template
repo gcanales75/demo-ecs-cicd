@@ -229,7 +229,7 @@ Resources:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       IpAddressType: ipv4
-      Name: demo-cicd
+      Name: demo-cicd-lb
       Scheme: internet-facing
       SecurityGroups:
         - !Ref LbSg
