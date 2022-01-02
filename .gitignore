@@ -6,3 +6,4 @@ CodeBuildBasePolicy-stpWebsite-us-east-1.json
 cicdEcsDemo.zip
 userdata.sh
 git
+.DS_Store
